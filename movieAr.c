@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-
 typedef struct set {
     int *subset;
     int order;
@@ -16,6 +15,7 @@ int power(int x, int y) {
     return sum;
 }
 
+//Copies the elements from a source set then adds in an additional element
 void Union(set *dest, set *source, int start, int end) {
     int n = source->order + 1;
     int *sub = malloc(2*n*sizeof(int));
@@ -32,6 +32,7 @@ void Union(set *dest, set *source, int start, int end) {
     return;
 }
 
+// Creates and returns all subsets of a given set. N is the order of the set  
 set* subsets(int* masterSet, int n) {
     int totalSets = 2;
     //T <- Empty set 
@@ -42,7 +43,7 @@ set* subsets(int* masterSet, int n) {
     T->subset = init;
     T->order = 1;
     T->next = NULL;
-    set *lastT = T,  *rootT = T;
+    set *lastT = T;
     //for e in S
     for(int i = 1; i < n; i++) {
         //V = empty set
@@ -73,8 +74,22 @@ set* subsets(int* masterSet, int n) {
 
     return T;    
 }
+
+// Checks to see if the subset has overlapping elements. Returns true if no overlapping elements exist
+int hasOverlaps(int *S, int order) {
+    for(int i = 0; i < order; i++) {
+        for(int j = 0; j < order; j++) {
+            if(i == j) 
+                continue;
+            else if( (S[i] >= S[j] && S[i] < S[j+order]) || (S[j] >= S[i] && S[j] < S[i+order])) 
+                return 1; 
+        }
+    }
+    return 0;
+}
+
 int main(void) {
-    int n, start, end;
+    int n;
     printf("Number of entries: ");
     scanf("%d", &n);
     int* masterSet = malloc(2*n*sizeof(int));
@@ -85,6 +100,25 @@ int main(void) {
     }
 
     set *powerset = subsets(masterSet, n);
+    set *Jmax = malloc(sizeof(set));
+    Jmax->order = 0;
+    set *search = powerset;
+    for(int i = 0; i < (power(2, n)-1); i++) {
+        if(i != 0) 
+            search = search->next;
+        if(search->order <= Jmax->order)
+           continue;
+        else if(hasOverlaps(search->subset, search->order))
+            continue;
+        Jmax->subset = search->subset;
+        Jmax->order = search->order;
+    }
+    printf("Acceptable max subset is: {");
+    for(int i = 0; i < Jmax->order; i++) {
+        printf("(%d, %d)", Jmax->subset[i], Jmax->subset[i+Jmax->order]);
+    }
+    printf("}\n");
+    
 /************************test print of power sets****************
     set *root = powerset;
     int count = power(2, n);
