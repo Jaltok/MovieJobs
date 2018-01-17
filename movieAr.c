@@ -1,3 +1,7 @@
+/* Copyright (c) 2018 Jeffrey Lund
+** Full search of a series of overlapping intervals 
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -17,17 +21,16 @@ int power(int x, int y) {
 
 //Copies the elements from a source set then adds in an additional element
 void Union(set *dest, set *source, int start, int end) {
-    int n = source->order + 1;
-    int *sub = malloc(2*n*sizeof(int));
+    dest->order = source->order + 1;
+    int *sub = malloc(2*dest->order*sizeof(int));
     
-    for(int i = 0; i < (n-1); i++) {
+    for(int i = 0; i < (dest->order-1); i++) {
         sub[i] = source->subset[i];
-        sub[i+n] = source->subset[i+(n-1)];
+        sub[i+dest->order] = source->subset[i+(dest->order-1)];
     }
-    sub[n-1] = start;
-    sub[2*n-1] = end;
+    sub[dest->order-1] = start;
+    sub[2*dest->order-1] = end;
     
-    dest->order = n;
     dest->subset = sub;
     return;
 }
@@ -88,23 +91,13 @@ int hasOverlaps(int *S, int order) {
     return 0;
 }
 
-int main(void) {
-    int n;
-    printf("Number of entries: ");
-    scanf("%d", &n);
-    int* masterSet = malloc(2*n*sizeof(int));
-
-    for(int i = 0; i < n; i++) {
-        printf("Enter start end: ");
-        scanf("%d %d", &masterSet[i], &masterSet[i+n]);
-    }
-
-    set *powerset = subsets(masterSet, n);
+//finds a set containing the maximum numbers of non overlapping jobs
+set* movieJobs(set *powerset, int n) {
     set *Jmax = malloc(sizeof(set));
     Jmax->order = 0;
     set *search = powerset;
     for(int i = 0; i < (power(2, n)-1); i++) {
-        if(i != 0) 
+        if(i != 0)
             search = search->next;
         if(search->order <= Jmax->order)
            continue;
@@ -113,14 +106,30 @@ int main(void) {
         Jmax->subset = search->subset;
         Jmax->order = search->order;
     }
+    return Jmax;
+}
+int main(void) {
+    int n; //number of intervals
+    printf("Number of entries: ");
+    scanf("%d", &n);
+    int* masterSet = malloc(2*n*sizeof(int)); //base set of intervals to build subsets from
+
+    for(int i = 0; i < n; i++) {
+        printf("Enter interval start and end time: ");
+        scanf("%d %d", &masterSet[i], &masterSet[i+n]);
+    }
+
+    set *powerset = subsets(masterSet, n);
+    set *Jmax = movieJobs(powerset, n);
+
     printf("\nAcceptable max subset is: {");
     for(int i = 0; i < Jmax->order; i++) {
         printf("(%d, %d)", Jmax->subset[i], Jmax->subset[i+Jmax->order]);
     }
     printf("}\n");
     
-/************************test print of power sets****************
-    set *root = powerset;
+//test print of power set
+  /*set *root = powerset;
     int count = power(2, n);
     for(int i = 0; i < count-1; i++) {
         int* temp = root->subset;
@@ -131,7 +140,7 @@ int main(void) {
         }
         printf("}\n");
         root = root->next;
-    }
-****************************************************************/
-    return 0;
+    }*/
+    
+return 0;
 }
