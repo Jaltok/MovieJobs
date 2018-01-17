@@ -1,11 +1,11 @@
 /* Copyright (c) 2018 Jeffrey Lund
 ** Full search of a series of overlapping intervals 
+** Number of jobs defined by argv 
 */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#define JOBS 10
 
 typedef struct set {
     int *subset;
@@ -110,18 +110,13 @@ set* movieJobs(set *powerset, int n) {
     }
     return Jmax;
 }
-int main(void) {
-    int n = JOBS; //number of intervals
+
+int main(int argc, char *argv[]) {
+	char *_n = argv[1];
+	int n = atoi(_n); //number of intervals
 	srand(time(NULL));
 	int delta;
-//    printf("Number of entries: ");
-//    scanf("%d", &n);
     int* masterSet = malloc(2*n*sizeof(int)); //base set of intervals to build subsets from
-
-//    for(int i = 0; i < n; i++) {
-//        printf("Enter interval start and end time: ");
-//        scanf("%d %d", &masterSet[i], &masterSet[i+n]);
-//    }
 
 	//random set generation
 	for(int i = 0; i < n; i++) {
