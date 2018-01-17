@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#define JOBS 27
+#define JOBS 10
 
 typedef struct set {
     int *subset;
