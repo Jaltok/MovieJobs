@@ -113,7 +113,7 @@ int main(void) {
         Jmax->subset = search->subset;
         Jmax->order = search->order;
     }
-    printf("Acceptable max subset is: {");
+    printf("\nAcceptable max subset is: {");
     for(int i = 0; i < Jmax->order; i++) {
         printf("(%d, %d)", Jmax->subset[i], Jmax->subset[i+Jmax->order]);
     }
