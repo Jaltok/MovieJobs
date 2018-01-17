@@ -140,19 +140,5 @@ int main(void) {
     }
     printf("}\n");
     
-//test print of power set
-  /*set *root = powerset;
-    int count = power(2, n);
-    for(int i = 0; i < count-1; i++) {
-        int* temp = root->subset;
-        int or = root->order;
-        printf("%d: {", i);
-        for(int j = 0; j < or; j++) {
-            printf("(%d,%d)", temp[j], temp[j+or]);
-        }
-        printf("}\n");
-        root = root->next;
-    }*/
-    
-return 0;
+    return 0;
 }
