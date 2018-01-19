@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <math.h>
 
 typedef struct set {
     int *subset;
@@ -13,69 +14,50 @@ typedef struct set {
     struct set *next;
 } set;
 
-//exponent function
-int power(int x, int y) {
-    int sum = x;
-    for(int i = 0; i < y-1; i++)
-        sum *= x;
-    return sum;
-}
-
 //Copies the elements from a source set then adds in an additional element
 void Union(set *dest, set *source, int start, int end) {
     dest->order = source->order + 1;
     int *sub = malloc(2*dest->order*sizeof(int));
     
-    for(int i = 0; i < (dest->order-1); i++) {
-        sub[i] = source->subset[i];
-        sub[i+dest->order] = source->subset[i+(dest->order-1)];
+	if(source->order == 0) { //if the source is the empty set
+		sub[0] = start;
+		sub[1] = end;
+	}
+	else {
+    	for(int i = 0; i < source->order; i++) {
+        	sub[i] = source->subset[i];
+        	sub[i+dest->order] = source->subset[i+(source->order)];
+    	}
+    	sub[source->order] = start;
+    	sub[2*source->order+1] = end;
     }
-    sub[dest->order-1] = start;
-    sub[2*dest->order-1] = end;
-    
+
     dest->subset = sub;
-    return;
 }
 
 // Creates and returns all subsets of a given set. N is the order of the set  
 set* createSubsets(int* masterSet, int n) {
-    int totalSets = 2;
+    int totalSets = 1; //empty set
     //T <- Empty set 
     set *T = malloc(sizeof(set));
-    int *init = malloc(2*sizeof(int));
-    init[0] = masterSet[0];
-    init[1] = masterSet[n];
-    T->subset = init;
-    T->order = 1;
+    T->subset = NULL;
+    T->order = 0;
     T->next = NULL;
-    set *lastT = T;
+    set *last = T, *root = T, *current;
     //for e in S
-    for(int i = 1; i < n; i++) {
-        //V = empty set
-        set *V = malloc(sizeof(set));
-        int *first = malloc(2*sizeof(int));
-        first[0] = masterSet[i];
-        first[1] = masterSet[i+n];
-        V->order = 1;
-        V->subset = first;
-        V->next = NULL;
-        set *rootV = V, *lastV = V;
-        //for W in T
-        set *W = T;
-        for(int j = 0; j < totalSets-1; j++) {
-            //insert (W union E) in V
-            if(j != 0) W = W->next;
-            set *E = malloc(sizeof(set));
-            E->next = NULL;
-            Union(E, W, masterSet[i], masterSet[i+n]);
-            lastV->next = E;
-            lastV = E;  
-        }
-        totalSets *= 2;
-        //T <- union W
-        lastT->next = rootV;
-        lastT = lastV;
+    for(int i = 0; i < n; i++) {
+		current = root;
+        for(int j = 0; j < totalSets; j++) {
+			if(j != 0)
+				 current = current->next;
+			set *temp = malloc(sizeof(set));
+			Union(temp, current, masterSet[i], masterSet[i+n]);
+			last->next = temp;
+			last = temp;
+		}
+		totalSets *= 2;
     }
+	last->next = NULL;
 
     return T;    
 }
@@ -99,8 +81,7 @@ set* movieJobs(set *powerset, int n) {
     set *jobsMax = malloc(sizeof(set));
     jobsMax->order = 0;
     set *search = powerset;
-    
-	for(int i = 0; i < (power(2, n)-1); i++) {
+    for(int i = 0; i < pow(2, n); i++) {
         if(i != 0)
             search = search->next;
         if(search->order <= jobsMax->order)
@@ -115,17 +96,16 @@ set* movieJobs(set *powerset, int n) {
 }
 
 int main(int argc, char *argv[]) {
-	char *_n = argv[1];
-	int n = atoi(_n); //number of intervals
 	srand(time(NULL));
+    char *_n = argv[1];
+	int n = atoi(_n); //number of intervals from 
     int* masterSet = malloc(2*n*sizeof(int)); //base set of intervals to build subsets from
 
-	//random set generation
-	for(int i = 0; i < n; i++) {
-		masterSet[i] = rand() % (4*n);
-		int delta = (4*n)-masterSet[i];
-		masterSet[i+n] = (rand() % delta) + masterSet[i];
-	}
+    for(int i = 0; i < n; i++) { //random set generation
+		masterSet[i] = rand()%(4*n);
+		int delta = (4*n) - masterSet[i];
+		masterSet[i+n] = (rand()%delta + masterSet[i]);
+    }
 
     set *jobsMax = movieJobs(createSubsets(masterSet, n), n);
 
