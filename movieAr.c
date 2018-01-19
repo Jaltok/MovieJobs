@@ -38,7 +38,7 @@ void Union(set *dest, set *source, int start, int end) {
 }
 
 // Creates and returns all subsets of a given set. N is the order of the set  
-set* subsets(int* masterSet, int n) {
+set* createSubsets(int* masterSet, int n) {
     int totalSets = 2;
     //T <- Empty set 
     set *T = malloc(sizeof(set));
@@ -90,48 +90,48 @@ int hasOverlaps(int *S, int order) {
                 return 1; 
         }
     }
-    return 0;
+    
+return 0;
 }
 
 //finds a set containing the maximum numbers of non overlapping jobs
 set* movieJobs(set *powerset, int n) {
-    set *Jmax = malloc(sizeof(set));
-    Jmax->order = 0;
+    set *jobsMax = malloc(sizeof(set));
+    jobsMax->order = 0;
     set *search = powerset;
-    for(int i = 0; i < (power(2, n)-1); i++) {
+    
+	for(int i = 0; i < (power(2, n)-1); i++) {
         if(i != 0)
             search = search->next;
-        if(search->order <= Jmax->order)
+        if(search->order <= jobsMax->order)
            continue;
         else if(hasOverlaps(search->subset, search->order))
             continue;
-        Jmax->subset = search->subset;
-        Jmax->order = search->order;
+        jobsMax->subset = search->subset;
+        jobsMax->order = search->order;
     }
-    return Jmax;
+    
+	return jobsMax;
 }
 
 int main(int argc, char *argv[]) {
 	char *_n = argv[1];
 	int n = atoi(_n); //number of intervals
 	srand(time(NULL));
-	int delta;
     int* masterSet = malloc(2*n*sizeof(int)); //base set of intervals to build subsets from
 
 	//random set generation
 	for(int i = 0; i < n; i++) {
 		masterSet[i] = rand() % (4*n);
-		delta = (4*n)-masterSet[i];
+		int delta = (4*n)-masterSet[i];
 		masterSet[i+n] = (rand() % delta) + masterSet[i];
-		//printf("%d %d\n", masterSet[i], masterSet[i+n]);
 	}
 
-    set *powerset = subsets(masterSet, n);
-    set *Jmax = movieJobs(powerset, n);
+    set *jobsMax = movieJobs(createSubsets(masterSet, n), n);
 
     printf("\nAcceptable max subset is: {");
-    for(int i = 0; i < Jmax->order; i++) {
-        printf("(%d, %d)", Jmax->subset[i], Jmax->subset[i+Jmax->order]);
+    for(int i = 0; i < jobsMax->order; i++) {
+        printf("(%d, %d)", jobsMax->subset[i], jobsMax->subset[i+jobsMax->order]);
     }
     printf("}\n");
     
