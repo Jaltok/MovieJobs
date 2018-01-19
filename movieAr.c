@@ -1,5 +1,6 @@
 /* Copyright (c) 2018 Jeffrey Lund
 ** Full search of a series of overlapping intervals 
+** Number of jobs defined by argv 
 */
 
 #include <stdio.h>
@@ -95,10 +96,10 @@ set* movieJobs(set *powerset, int n) {
 int main(int argc, char *argv[]) {
 	srand(time(NULL));
     char *_n = argv[1];
-	int n = atoi(_n); //number of intervals
+	int n = atoi(_n); //number of intervals from 
     int* masterSet = malloc(2*n*sizeof(int)); //base set of intervals to build subsets from
 
-    for(int i = 0; i < n; i++) {
+    for(int i = 0; i < n; i++) { //random set generation
 		masterSet[i] = rand()%(4*n);
 		int delta = (4*n) - masterSet[i];
 		masterSet[i+n] = (rand()%delta + masterSet[i]);
