@@ -15,7 +15,7 @@ typedef struct set {
 } set;
 
 //Copies the elements from a source set then adds in an additional element
-void Union(set *dest, set *source, int start, int end) {
+void addExpandedSet(set *dest, set *source, int start, int end) {
     dest->order = source->order + 1;
     int *sub = malloc(2*dest->order*sizeof(int));
     
@@ -28,6 +28,7 @@ void Union(set *dest, set *source, int start, int end) {
         	sub[i] = source->subset[i];
         	sub[i+dest->order] = source->subset[i+(source->order)];
     	}
+
     	sub[source->order] = start;
     	sub[2*source->order+1] = end;
     }
@@ -38,12 +39,12 @@ void Union(set *dest, set *source, int start, int end) {
 // Creates and returns all subsets of a given set. N is the order of the set  
 set* createSubsets(int* masterSet, int n) {
     int totalSets = 1; //empty set
-    //T <- Empty set 
-    set *T = malloc(sizeof(set));
-    T->subset = NULL;
-    T->order = 0;
-    T->next = NULL;
-    set *last = T, *root = T, *current;
+    //powerSet <- Empty set 
+    set *powerSet = malloc(sizeof(set));
+    powerSet->subset = NULL;
+    powerSet->order = 0;
+    powerSet->next = NULL;
+    set *last = powerSet, *root = powerSet, *current;
     //for e in S
     for(int i = 0; i < n; i++) {
 		current = root;
@@ -51,7 +52,7 @@ set* createSubsets(int* masterSet, int n) {
 			if(j != 0)
 				 current = current->next;
 			set *temp = malloc(sizeof(set));
-			Union(temp, current, masterSet[i], masterSet[i+n]);
+			addExpandedSet(temp, current, masterSet[i], masterSet[i+n]);
 			last->next = temp;
 			last = temp;
 		}
@@ -59,7 +60,7 @@ set* createSubsets(int* masterSet, int n) {
     }
 	last->next = NULL;
 
-    return T;    
+    return powerSet;    
 }
 
 // Checks to see if the subset has overlapping elements. Returns true if no overlapping elements exist
@@ -73,7 +74,7 @@ int hasOverlaps(int *S, int order) {
         }
     }
     
-return 0;
+	return 0;
 }
 
 //finds a set containing the maximum numbers of non overlapping jobs
@@ -115,5 +116,5 @@ int main(int argc, char *argv[]) {
     }
     printf("}\n");
     
-    return 0;
+    return 1;
 }
